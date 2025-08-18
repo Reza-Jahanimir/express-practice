@@ -1,29 +1,24 @@
-const express = require("express")
-const bodyParser = require("body-parser")
+const path = require('path');
 
-const app = express()
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
 
-app.use(bodyParser.urlencoded({ extended: false}))
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
-app.use('/add-product', (req, res, next) => {
-    res.send(
-       `<form action="/product" method="POST">
-        <input type="text" name="title" placeholder="Product Title"><br>
-        <input type="text" name="category" placeholder="Product Category"><br>
-        <button type="submit">Add Product</button>
-        </form>`
-    )
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+const errorController = require("./controllers/error")
+
+app.use(bodyParser.urlencoded({extended: false}));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
+app.use(errorController.get404  );
+
+app.listen(3000,  () => {
+  console.log('Server running on http://localhost:3000');
 });
-
-app.post('/product', (req, res, next) => {
-    console.log(req.body)
-    res.redirect("/")
-});
-
-app.use('/', (req, res, next) => {
-    res.send('<h1>main page</h1>')
-});
-
-app.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
-})
